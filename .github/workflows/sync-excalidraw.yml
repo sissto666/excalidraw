@@ -1,0 +1,43 @@
+name: Auto Sync Excalidraw Fork
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # 每天午夜（UTC时间0点，北京时间早上8点）自动执行
+  workflow_dispatch:     # 保留手动触发按钮，方便你随时点击更新
+
+jobs:
+  sync_with_upstream:
+    name: Sync with Upstream Excalidraw
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.fork }}
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync Upstream
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        with:
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          upstream_sync_repo: excalidraw/excalidraw # Excalidraw 官方源仓库
+          upstream_sync_branch: master              # 注意这里：原项目的主分支是 master
+          target_sync_branch: master                # 你 Fork 过来的主分支也是 master
+          test_mode: false
+
+      - name: Check for new commits
+        if: success()
+        run: echo "Sync completed successfully"
+
+      - name: Check for Failure
+        if: failure()
+        run: |
+          echo "[Error] Sync failed. This might be due to:"
+          echo "1. Changes in the upstream workflow file"
+          echo "2. Merge conflicts that need manual resolution"
+          echo "Please check the logs and consider manual sync if needed."
+          exit 1
