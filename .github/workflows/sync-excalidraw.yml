@@ -18,12 +18,12 @@ jobs:
       - name: Checkout target repo
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SYNC }}
 
       - name: Sync Upstream
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
         with:
-          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          target_repo_token: ${{ secrets.SYNC }}
           upstream_sync_repo: excalidraw/excalidraw # Excalidraw 官方源仓库
           upstream_sync_branch: master              # 注意这里：原项目的主分支是 master
           target_sync_branch: master                # 你 Fork 过来的主分支也是 master
